@@ -1,0 +1,12 @@
+{
+  "name": "upload2s3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.978.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
