@@ -19,7 +19,7 @@ if (folder && bucket) {
     console.error("Missing bucket name");
   }
 
-  console.info("Usage: upload2s3 folder bucket");
+  console.info("Usage: s3-upload-folder folder bucket");
 }
 
 function uploadDir(s3Path, bucketName) {
