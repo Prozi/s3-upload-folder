@@ -57,7 +57,7 @@ function uploadDir(s3Path, bucketName) {
     )}`;
 
     if (dryRun) {
-      console.info(`Dry upload: ${mimeLog}`);
+      console.info(`Dry upload: ${uploadLog}`);
 
       return;
     }
