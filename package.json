@@ -1,8 +1,11 @@
 {
-  "name": "upload2s3",
-  "version": "1.0.0",
+  "name": "s3-upload-folder",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
+  "bin": {
+    "s3-upload-folder": "bin/s3-upload-folder.js"
+  },
   "dependencies": {
     "aws-sdk": "^2.978.0",
     "chalk": "^4.1.2",
