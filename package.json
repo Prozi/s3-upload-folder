@@ -17,5 +17,9 @@
   },
   "devDependencies": {
     "prettier": "^2.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Prozi/s3-upload-folder.git"
   }
 }
