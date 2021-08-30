@@ -39,18 +39,17 @@ function uploadDir(s3Path, bucketName) {
   }
 
   walkSync(s3Path, function (filePath) {
+    if (filePath.endsWith("/")) {
+      return;
+    }
+
     const bucketPath = `${dirName}${filePath.split(dirName)[1]}`;
     const params = {
       Bucket: bucketName,
       Key: bucketPath,
       Body: fs.readFileSync(filePath),
+      ContentType: mime.lookup(bucketPath) || "text/plain",
     };
-
-    if (bucketPath.endsWith("/")) {
-      return;
-    }
-
-    params.ContentType = mime.lookup(bucketPath);
 
     const uploadLog = `${chalk.blueBright(bucketPath)} as ${chalk.whiteBright(
       params.ContentType
@@ -58,16 +57,14 @@ function uploadDir(s3Path, bucketName) {
 
     if (dryRun) {
       console.info(`Dry upload: ${uploadLog}`);
-
-      return;
+    } else {
+      s3.putObject(params, function (err) {
+        if (err) {
+          console.log(err.message);
+        } else {
+          console.info(`Uploaded: ${uploadLog}`);
+        }
+      });
     }
-
-    s3.putObject(params, function (err) {
-      if (err) {
-        console.log(err.message);
-      } else {
-        console.info(`Uploaded: ${uploadLog}`);
-      }
-    });
   });
 }
