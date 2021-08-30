@@ -12,7 +12,7 @@ if (folder && bucket) {
   uploadDir(folder, bucket);
 } else {
   if (!folder) {
-    console.error("Missing foler name");
+    console.error("Missing folder name");
   }
 
   if (!bucket) {
