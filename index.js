@@ -4,6 +4,7 @@ const chalk = require("chalk");
 const path = require("path");
 const fs = require("fs");
 
+const makePublic = Array.from(process.argv).join(" ").includes("--public");
 const dryRun = Array.from(process.argv).join(" ").includes("--dry");
 const folder = process.argv[2];
 const bucket = process.argv[3];
@@ -12,14 +13,16 @@ if (folder && bucket) {
   uploadDir(folder, bucket);
 } else {
   if (!folder) {
-    console.error("Missing folder name");
+    console.error("Missing folder path");
   }
 
   if (!bucket) {
     console.error("Missing bucket name");
   }
 
-  console.info("Usage: s3-upload-folder folder bucket");
+  console.info(
+    "Usage: s3-upload-folder ./folder bucket_name [--dry] [--public]"
+  );
 }
 
 function uploadDir(s3Path, bucketName) {
@@ -55,12 +58,16 @@ function uploadDir(s3Path, bucketName) {
       params.ContentType
     )}`;
 
+    if (makePublic) {
+      params.ACL = "public-read";
+    }
+
     if (dryRun) {
       console.info(`Dry upload: ${uploadLog}`);
     } else {
       s3.putObject(params, function (err) {
         if (err) {
-          console.log(err.message);
+          console.error(err.message);
         } else {
           console.info(`Uploaded: ${uploadLog}`);
         }
