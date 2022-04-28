@@ -1,6 +1,5 @@
 const AWS = require("aws-sdk");
 const mime = require("mime-types");
-const chalk = require("chalk");
 const path = require("path");
 const fs = require("fs");
 
@@ -8,21 +7,28 @@ const makePublic = Array.from(process.argv).join(" ").includes("--public");
 const dryRun = Array.from(process.argv).join(" ").includes("--dry");
 const folder = process.argv[2];
 const bucket = process.argv[3];
+const relativeTo = process.argv[4]?.startsWith("--") ? "" : process.argv[4];
 
 if (folder && bucket) {
   uploadDir(folder, bucket);
 } else {
   if (!folder) {
-    console.error("Missing folder path");
+    console.error("Error: Missing folder path");
   }
 
   if (!bucket) {
-    console.error("Missing bucket name");
+    console.error("Error: Missing bucket name");
   }
 
-  console.info(
-    "Usage: s3-upload-folder ./folder bucket_name [--dry] [--public]"
-  );
+  console.info(`
+    Usage: 's3-upload-folder folder bucket_name [folder] [--dry] [--public]'
+
+    - 'folder' - folder contents to upload
+    - 'bucket_name' - your s3 bucket name
+    - 'folder' - relative target path (defaults to folder to upload, can use ..)
+    - '--dry' - run example how it would look, without upload
+    - '--public' - specify upload objects as public
+  `);
 }
 
 function uploadDir(s3Path, bucketName) {
@@ -31,8 +37,9 @@ function uploadDir(s3Path, bucketName) {
 
   function walkSync(currentDirPath, callback) {
     fs.readdirSync(currentDirPath).forEach(function (name) {
-      var filePath = path.join(currentDirPath, name);
-      var stat = fs.statSync(filePath);
+      let filePath = path.join(currentDirPath, name);
+      let stat = fs.statSync(filePath);
+
       if (stat.isFile()) {
         callback(filePath, stat);
       } else if (stat.isDirectory()) {
@@ -46,17 +53,19 @@ function uploadDir(s3Path, bucketName) {
       return;
     }
 
-    const bucketPath = `${dirName}${filePath.split(dirName)[1]}`;
+    const targetFilePath = path.join(
+      dirName,
+      relativeTo,
+      filePath.split(dirName)[1].substr(1)
+    );
     const params = {
       Bucket: bucketName,
-      Key: bucketPath,
+      Key: targetFilePath,
       Body: fs.readFileSync(filePath),
-      ContentType: mime.lookup(bucketPath) || "text/plain",
+      ContentType: mime.lookup(targetFilePath) || "text/plain",
     };
 
-    const uploadLog = `${chalk.blueBright(bucketPath)} as ${chalk.whiteBright(
-      params.ContentType
-    )}`;
+    const uploadLog = `${targetFilePath} as ${params.ContentType}`;
 
     if (makePublic) {
       params.ACL = "public-read";
