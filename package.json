@@ -7,7 +7,7 @@
     "s3-upload-folder": "bin/s3-upload-folder.js"
   },
   "dependencies": {
-    "aws-sdk": "^2.1123.0",
+    "aws-sdk": "^2.1354.0",
     "mime-types": "^2.1.35"
   },
   "scripts": {
